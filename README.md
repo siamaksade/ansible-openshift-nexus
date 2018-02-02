@@ -27,7 +27,7 @@ name: Example Playbook
 hosts: localhost
 tasks:
 - import_role:
-    name: openshift_nexus
+    name: siamaksade.openshift_nexus
   vars:
     project_name: "cicd-project"
     nexus_image_version: "3.7.2"

@@ -1,4 +1,5 @@
 Ansible Role: Sonatype Nexus on OpenShift
+[![Build Status](https://travis-ci.org/siamaksade/ansible-openshift-nexus.svg?branch=master)](https://travis-ci.org/siamaksade/ansible-openshift-nexus)
 =========
 
 Ansible Role for deploying Sonatype Nexus on OpenShift with Red Hat enterprise maven repositories preconfigure on Nexus

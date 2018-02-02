@@ -1,0 +1,13 @@
+---
+dependencies: []
+
+galaxy_info:
+  author: siamaksade
+  description: Sonatype Nexus for OpenShift
+  company: "Red Hat"
+  license: "license (BSD, MIT)"
+  min_ansible_version: 2.3
+  galaxy_tags:
+    - openshift
+    - cicd
+    - nexus

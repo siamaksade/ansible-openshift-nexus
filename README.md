@@ -1,7 +1,7 @@
 Ansible Role: Sonatype Nexus on OpenShift
 =========
 
-Ansible Role for Deploying Sonatype Nexus on OpenShift with Red Hat enterprise maven repositories preconfigure on Nexus
+Ansible Role for deploying Sonatype Nexus on OpenShift with Red Hat enterprise maven repositories preconfigure on Nexus
 
 
 Role Variables

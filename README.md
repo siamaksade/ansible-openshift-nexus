@@ -1,9 +1,11 @@
-# Ansible Role: Sonatype Nexus on OpenShift
+Ansible Role: Sonatype Nexus on OpenShift
+=========
 
 Ansible Role for Deploying Sonatype Nexus on OpenShift with Red Hat enterprise maven repositories preconfigure on Nexus
 
 
-## Role Variables
+Role Variables
+------------
 
 |Variable               | Default Value            | Description   |
 |-----------------------|--------------------------|---------------|
@@ -17,7 +19,8 @@ Ansible Role for Deploying Sonatype Nexus on OpenShift with Red Hat enterprise m
 |`openshift_cli`        | oc                       | OpenShift CLI command and arguments (e.g. auth)       | 
 
 
-## Example Playbook
+Example Playbook
+------------
 
 ```
 name: Example Playbook

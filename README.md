@@ -29,7 +29,7 @@ tasks:
 - import_role:
     name: openshift_nexus
   vars:
-    project_name: "cicd_project"
+    project_name: "cicd-project"
     nexus_image_version: "3.7.2"
     openshift_cli: "oc --server http://master:8443"
 ```

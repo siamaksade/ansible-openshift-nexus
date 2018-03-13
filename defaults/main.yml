@@ -9,3 +9,5 @@ project_desc: Nexus Repository Manager
 # project_annotations:
 
 openshift_cli: oc
+
+ephemeral: false

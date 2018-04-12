@@ -10,9 +10,13 @@ Role Variables
 
 |Variable               | Default Value            | Description   |
 |-----------------------|--------------------------|---------------|
+|`nexus_service_name`   | nexus                    | Nexus service name on OpenShift  |
 |`nexus_image_version`  | 3.7.1                    | Nexus image version as available on Docker Hub for [Nexus 2](https://hub.docker.com/r/sonatype/nexus/tags/) and [Nexus 3](https://hub.docker.com/r/sonatype/nexus3/tags) |
 |`nexus_volume_capacity`| 10Gi                     | Persistent volume capacity for Nexus  |
-|`nexus_max_memory`     | 2Gi                      | Memory allocated to Nexus container |
+|`nexus_max_memory`     | 2Gi                      | Max memory allocated to Nexus container |
+|`nexus_min_memory`     | 512Mi                    | Min memory allocated to Nexus container |
+|`nexus_max_cpu`        | 1                        | Max cpu allocated to Nexus container |
+|`nexus_min_cpu`        | 200m                     | Min cpu allocated to Nexus container |
 |`project_name`         | nexus                    | OpenShift project name for the Nexus container  |
 |`project_display_name` | Nexus                    | OpenShift project display name for the Nexus container  |
 |`project_desc`         | Nexus Repository Manager | OpenShift project description for the Nexus container |

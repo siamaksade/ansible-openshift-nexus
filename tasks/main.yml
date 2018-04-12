@@ -32,7 +32,7 @@
 
 # deploy nexus    
 - name: check if nexus exists
-  shell: "{{ openshift_cli }} get service nexus -n {{ project_name }}"
+  shell: "{{ openshift_cli }} get service {{ nexus_service_name }} -n {{ project_name }}"
   register: nexus_result
   ignore_errors: true
   changed_when: false
@@ -41,6 +41,7 @@
   shell: |
     {{ openshift_cli }} new-app -f https://raw.githubusercontent.com/OpenShiftDemos/nexus/master/nexus{{ nexus_image_version[:1] }}-persistent-template.yaml \
         --param=VOLUME_CAPACITY={{ nexus_volume_capacity }} \
+        --param=SERVICE_NAME={{ nexus_service_name }} \
         --param=MAX_MEMORY={{ nexus_max_memory }} \
         --param=NEXUS_VERSION={{ nexus_image_version }} \
         -n {{ project_name }}
@@ -50,12 +51,16 @@
   shell: |
     {{ openshift_cli }} new-app -f https://raw.githubusercontent.com/OpenShiftDemos/nexus/master/nexus{{ nexus_image_version[:1] }}-template.yaml \
         --param=MAX_MEMORY={{ nexus_max_memory }} \
+        --param=SERVICE_NAME={{ nexus_service_name }} \
         --param=NEXUS_VERSION={{ nexus_image_version }} \
         -n {{ project_name }}
   when: nexus_result|failed and ephemeral
 
+- name: set nexus resources
+  shell: "{{ openshift_cli }} set resources dc/{{ nexus_service_name }} --limits=cpu={{ nexus_max_cpu }},memory={{ nexus_max_memory }} --requests=cpu={{ nexus_min_cpu }},memory={{ nexus_min_memory }} -n {{ project_name }}"
+
 - name: get nexus route
-  shell: "{{ openshift_cli }} get route nexus -o json -n {{ project_name }}"
+  shell: "{{ openshift_cli }} get route {{ nexus_service_name }} -o json -n {{ project_name }}"
   register: nexus_result
   changed_when: false
 

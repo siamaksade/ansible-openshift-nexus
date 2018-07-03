@@ -84,22 +84,24 @@
     - update_admin_password
     - setup_user
 
-- name: Update admin password
+- name: Create additional admin user {{ nexus_admin_user }}
   import_tasks: ./call_script.yml
   vars:
     script_name: setup_user
-    args: # this structure will be parsed by the groovy JsonSlurper above
+    args: # this structure will be parsed by the groovy JsonSlurper
       username: "{{ nexus_admin_user }}" 
       first_name: "Admin"
       last_name: "User"
       email: "admin@none.com"
       roles: '["nx-admin"]'
       password: "{{ nexus_admin_password }}"
+  when: nexus_admin_user == "admin"
 
 # This task need to be the last one as the admin's password will be changed
-- name: Update admin password 
+- name: Update admin password for base user admin
   import_tasks: ./call_script.yml
   vars:
-    script_name: update_admin_password
-    args: # this structure will be parsed by the groovy JsonSlurper above
+    script_name: update_password
+    args: 
+      username: "admin"
       new_password: "{{ nexus_admin_password }}"

@@ -16,3 +16,7 @@ project_desc: Nexus Repository Manager
 openshift_cli: oc
 
 ephemeral: false
+
+current_nexus_admin_password: admin123
+nexus_admin_user: adminuser
+nexus_admin_password: admin456

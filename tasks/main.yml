@@ -8,15 +8,15 @@
   ignore_errors: true
   changed_when: false
 
-- name: create gogs project {{ project_name }}
+- name: create nexus project {{ project_name }}
   shell: "{{ openshift_cli }} new-project {{ project_name }} --display-name='{{ project_display_name }}' --description='{{ project_desc }}'"
-  when: nexus_project_result|failed
+  when: nexus_project_result is failed
 
 - name: assign user as project admin
   shell: "{{ openshift_cli }} adm policy add-role-to-user admin {{ project_admin }} -n {{ project_name }}"
   ignore_errors: true
   when:
-    - nexus_project_result|failed
+    - nexus_project_result is failed
     - project_admin is defined
     - project_admin is not none
     - project_admin|trim() != ""
@@ -25,7 +25,7 @@
   shell: "{{ openshift_cli }} annotate --overwrite namespace {{ project_name }} {{ project_annotations }}"
   ignore_errors: true
   when:
-    - nexus_project_result|failed
+    - nexus_project_result is failed
     - project_annotations is defined
     - project_annotations is not none
     - project_annotations|trim() != ""
@@ -45,7 +45,7 @@
         --param=MAX_MEMORY={{ nexus_max_memory }} \
         --param=NEXUS_VERSION={{ nexus_image_version }} \
         -n {{ project_name }}
-  when: nexus_result|failed and not ephemeral
+  when: nexus_result is failed and not ephemeral
 
 - name: deploy nexus template (ephemeral)
   shell: |
@@ -54,21 +54,52 @@
         --param=SERVICE_NAME={{ nexus_service_name }} \
         --param=NEXUS_VERSION={{ nexus_image_version }} \
         -n {{ project_name }}
-  when: nexus_result|failed and ephemeral
+  when: nexus_result is failed and ephemeral
 
 - name: set nexus resources
   shell: "{{ openshift_cli }} set resources dc/{{ nexus_service_name }} --limits=cpu={{ nexus_max_cpu }},memory={{ nexus_max_memory }} --requests=cpu={{ nexus_min_cpu }},memory={{ nexus_min_memory }} -n {{ project_name }}"
 
 - name: get nexus route
-  shell: "{{ openshift_cli }} get route {{ nexus_service_name }} -o json -n {{ project_name }}"
-  register: nexus_result
+  shell: "{{ openshift_cli }} get route {{ nexus_service_name }} -o jsonpath='{ .spec.host }' -n {{ project_name }}"
+  register: nexus_route_output
   changed_when: false
+
+- set_fact:
+    nexus_route: "{{ nexus_route_output.stdout }}"
 
 - name: wait for nexus to be running
   uri:
-    url: http://{{ nexus_result.stdout|from_json|json_query('spec.host') }}
+    url: http://{{ nexus_route }}
     status_code: 200
   register: result
   until: result.status == 200
   retries: 30
   delay: 30
+
+# Using groovy scripts to configure nexus:
+
+- name: Upload scripts
+  include_tasks: ./upload_script.yml
+  with_items:
+    - update_admin_password
+    - setup_user
+
+- name: Update admin password
+  import_tasks: ./call_script.yml
+  vars:
+    script_name: setup_user
+    args: # this structure will be parsed by the groovy JsonSlurper above
+      username: "{{ nexus_admin_user }}" 
+      first_name: "Admin"
+      last_name: "User"
+      email: "admin@none.com"
+      roles: '["nx-admin"]'
+      password: "{{ nexus_admin_password }}"
+
+# This task need to be the last one as the admin's password will be changed
+- name: Update admin password 
+  import_tasks: ./call_script.yml
+  vars:
+    script_name: update_admin_password
+    args: # this structure will be parsed by the groovy JsonSlurper above
+      new_password: "{{ nexus_admin_password }}"

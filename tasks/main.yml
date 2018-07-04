@@ -1,5 +1,10 @@
 ---
 ## Sonatype Nexus Install
+- assert:
+    that:
+      - nexus_image_version is version('3.0','>=')
+      - nexus_image_version is version('4.0','<')
+    msg: "This role only supports nexus 3 images. Change 'nexus_image_version' parameter"
 
 # create project
 - name: check if nexus project {{ project_name }} exists
@@ -39,7 +44,7 @@
 
 - name: deploy nexus template (persistent)
   shell: |
-    {{ openshift_cli }} new-app -f https://raw.githubusercontent.com/OpenShiftDemos/nexus/master/nexus{{ nexus_image_version[:1] }}-persistent-template.yaml \
+    {{ openshift_cli }} new-app -f https://raw.githubusercontent.com/OpenShiftDemos/nexus/master/nexus3-persistent-template.yaml \
         --param=VOLUME_CAPACITY={{ nexus_volume_capacity }} \
         --param=SERVICE_NAME={{ nexus_service_name }} \
         --param=MAX_MEMORY={{ nexus_max_memory }} \
@@ -49,7 +54,7 @@
 
 - name: deploy nexus template (ephemeral)
   shell: |
-    {{ openshift_cli }} new-app -f https://raw.githubusercontent.com/OpenShiftDemos/nexus/master/nexus{{ nexus_image_version[:1] }}-template.yaml \
+    {{ openshift_cli }} new-app -f https://raw.githubusercontent.com/OpenShiftDemos/nexus/master/nexus3-template.yaml \
         --param=MAX_MEMORY={{ nexus_max_memory }} \
         --param=SERVICE_NAME={{ nexus_service_name }} \
         --param=NEXUS_VERSION={{ nexus_image_version }} \
@@ -67,6 +72,13 @@
 - set_fact:
     nexus_route: "{{ nexus_route_output.stdout }}"
 
+- set_fact:
+    nexus_rest_endpoint: "http://{{ nexus_route }}/service/siesta/rest"
+  when: nexus_image_version is version('3.8','<')
+- set_fact:
+    nexus_rest_endpoint: "http://{{ nexus_route }}/service/rest"
+  when: nexus_image_version is version('3.8','>=')
+
 - name: wait for nexus to be running
   uri:
     url: http://{{ nexus_route }}
@@ -81,7 +93,7 @@
 - name: Upload scripts
   include_tasks: ./upload_script.yml
   with_items:
-    - update_admin_password
+    - update_password
     - setup_user
 
 - name: Create additional admin user {{ nexus_admin_user }}
@@ -95,7 +107,7 @@
       email: "admin@none.com"
       roles: '["nx-admin"]'
       password: "{{ nexus_admin_password }}"
-  when: nexus_admin_user == "admin"
+  when: nexus_admin_user != "admin"
 
 # This task need to be the last one as the admin's password will be changed
 - name: Update admin password for base user admin
@@ -105,3 +117,4 @@
     args: 
       username: "admin"
       new_password: "{{ nexus_admin_password }}"
+  when: current_nexus_admin_password != nexus_admin_password

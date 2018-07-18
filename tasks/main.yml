@@ -63,6 +63,7 @@
 
 - name: set nexus resources
   shell: "{{ openshift_cli }} set resources dc/{{ nexus_service_name }} --limits=cpu={{ nexus_max_cpu }},memory={{ nexus_max_memory }} --requests=cpu={{ nexus_min_cpu }},memory={{ nexus_min_memory }} -n {{ project_name }}"
+  ignore_errors: true
 
 - name: get nexus route
   shell: "{{ openshift_cli }} get route {{ nexus_service_name }} -o jsonpath='{ .spec.host }' -n {{ project_name }}"

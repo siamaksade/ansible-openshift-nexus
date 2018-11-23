@@ -35,7 +35,7 @@ When listing this role in `requirements.yml`, make sure to pin the version of th
 
 ```
 - src: siamaksade.openshift_nexus
-  version: 1.3.0
+  version: 1.1.0
 ```  
 
 The following tables shows the version combinations that are tested and verified:
@@ -43,7 +43,7 @@ The following tables shows the version combinations that are tested and verified
 | Role Version      | OpenShift Version |
 |-------------------|-------------------|
 | 1.0.x   | 3.7.x   |
-| 1.1.x   | 3.9.x,3.10.x,3.11.x  |
+| 1.1.x   | 3.9.x, 3.10.x, 3.11.x  |
 
 Note that if a version combination is not listed above, it does **NOT** mean that the latest role version 
 won't work on a new OpenShift version. The above table is merely the combinations that we have tested and verified.
